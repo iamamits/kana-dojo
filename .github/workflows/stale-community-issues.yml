@@ -36,6 +36,7 @@ jobs:
 
             const themeBacklogPath = 'data/community/theme-backlog.json';
             const factsBacklogPath = 'data/community/facts-backlog.json';
+            const proverbsBacklogPath = 'data/community/proverbs-backlog.json';
 
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -52,6 +53,7 @@ jobs:
             let needsCommit = false;
             let themes = JSON.parse(fs.readFileSync(themeBacklogPath, 'utf8'));
             let facts = JSON.parse(fs.readFileSync(factsBacklogPath, 'utf8'));
+            let proverbs = JSON.parse(fs.readFileSync(proverbsBacklogPath, 'utf8'));
 
             for (const issue of issues) {
               if (!issue.assignees || issue.assignees.length === 0) {
@@ -124,6 +126,19 @@ jobs:
                       console.log('Fact #' + factId + ' is already completed, not re-enabling');
                     }
                   }
+                } else if (title.includes('Add Japanese Proverb #')) {
+                  const proverbIdMatch = title.match(/#(\d+)/);
+                  if (proverbIdMatch) {
+                    const proverbId = parseInt(proverbIdMatch[1]);
+                    const proverbIndex = proverbs.findIndex(function(p) { return p.id === proverbId; });
+                    if (proverbIndex !== -1 && !proverbs[proverbIndex].completed) {
+                      proverbs[proverbIndex].issued = false;
+                      needsCommit = true;
+                      console.log('Re-enabled proverb #' + proverbId);
+                    } else if (proverbIndex !== -1 && proverbs[proverbIndex].completed) {
+                      console.log('Proverb #' + proverbId + ' is already completed, not re-enabling');
+                    }
+                  }
                 }
                 
               } else if (timeSinceActivity >= WARNING_THRESHOLD_MS && !hasWarning) {
@@ -152,6 +167,7 @@ jobs:
             if (needsCommit) {
               fs.writeFileSync(themeBacklogPath, JSON.stringify(themes, null, 2));
               fs.writeFileSync(factsBacklogPath, JSON.stringify(facts, null, 2));
+              fs.writeFileSync(proverbsBacklogPath, JSON.stringify(proverbs, null, 2));
               core.setOutput('needs_commit', 'true');
             } else {
               core.setOutput('needs_commit', 'false');

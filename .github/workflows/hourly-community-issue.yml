@@ -42,10 +42,12 @@ jobs:
             const statePath = 'data/community/automation-state.json';
             const themeBacklogPath = 'data/community/theme-backlog.json';
             const factsBacklogPath = 'data/community/facts-backlog.json';
+            const proverbsBacklogPath = 'data/community/proverbs-backlog.json';
 
             let state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
             const themes = JSON.parse(fs.readFileSync(themeBacklogPath, 'utf8'));
             const facts = JSON.parse(fs.readFileSync(factsBacklogPath, 'utf8'));
+            const proverbs = JSON.parse(fs.readFileSync(proverbsBacklogPath, 'utf8'));
 
             // Fetch existing open issues to check for duplicates
             const { data: existingIssues } = await github.rest.issues.listForRepo({
@@ -55,7 +57,10 @@ jobs:
               per_page: 100
             });
 
-            const nextType = state.lastType === 'theme' ? 'fact' : 'theme';
+            // Rotate through types: theme -> fact -> proverb -> theme...
+            const typeOrder = ['theme', 'fact', 'proverb'];
+            const currentIndex = typeOrder.indexOf(state.lastType);
+            const nextType = typeOrder[(currentIndex + 1) % typeOrder.length];
 
             let item, issueTitle, issueBody;
 
@@ -188,6 +193,76 @@ jobs:
               const factIndex = facts.findIndex(function(f) { return f.id === item.id; });
               facts[factIndex].issued = true;
               fs.writeFileSync(factsBacklogPath, JSON.stringify(facts, null, 2));
+            } else {
+              // Proverb
+              item = proverbs.find(function(p) { return !p.issued && !p.completed; });
+              
+              if (!item) {
+                console.log('No more proverbs available in backlog.');
+                core.setOutput('should_commit', 'false');
+                return;
+              }
+              
+              // Check for duplicate proverb issue
+              const duplicateProverb = existingIssues.find(function(issue) {
+                return issue.title.includes('Add Japanese Proverb #' + item.id);
+              });
+              
+              if (duplicateProverb) {
+                console.log('Issue already exists for proverb #' + item.id + ': #' + duplicateProverb.number + '. Marking as issued and skipping.');
+                const proverbIdx = proverbs.findIndex(function(p) { return p.id === item.id; });
+                proverbs[proverbIdx].issued = true;
+                fs.writeFileSync(proverbsBacklogPath, JSON.stringify(proverbs, null, 2));
+                
+                // Update lastType so next run tries the other type
+                state.lastType = nextType;
+                state.lastRun = new Date().toISOString();
+                fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
+                
+                core.setOutput('should_commit', 'true');
+                return;
+              }
+              
+              const tmpl = t.proverb;
+              issueTitle = tmpl.title.replace('{id}', item.id);
+              
+              const instructions = tmpl.instructions.map(function(instr, i) {
+                return (i + 1) + '. ' + instr.replace(/{id}/g, item.id);
+              });
+              
+              // Create code block for the proverb JSON
+              const codeBlock = '```json\n{\n' +
+                '  "japanese": "' + item.japanese + '",\n' +
+                '  "romaji": "' + item.romaji + '",\n' +
+                '  "english": "' + item.english + '",\n' +
+                '  "meaning": "' + item.meaning + '"\n' +
+                '}\n```';
+              
+              issueBody = tmpl.header + '\n\n' +
+                '**Category:** ' + tmpl.category + '  \n' +
+                '**Difficulty:** ' + tmpl.difficulty + '  \n' +
+                '**Estimated Time:** ' + tmpl.estimatedTime + '\n\n' +
+                '---\n\n' +
+                '### 🎯 Your Task\n\n' +
+                tmpl.taskDescription + '\n\n' +
+                tmpl.proverbHeader + '\n\n' +
+                '| Japanese | Reading | English |\n|----------|---------|---------|\n' +
+                '| **' + item.japanese + '** | ' + item.romaji + ' | ' + item.english + ' |\n\n' +
+                '> 💡 **Meaning:** ' + item.meaning + '\n\n' +
+                tmpl.instructionsHeader + '\n\n' +
+                instructions[0] + '\n' +
+                instructions[1] + '\n' +
+                instructions[2] + '\n\n' +
+                codeBlock + '\n\n' +
+                instructions[3] + '\n' +
+                instructions[4] + '\n' +
+                instructions[5] + '\n\n' +
+                '---\n\n' +
+                tmpl.footer;
+              
+              const proverbIndex = proverbs.findIndex(function(p) { return p.id === item.id; });
+              proverbs[proverbIndex].issued = true;
+              fs.writeFileSync(proverbsBacklogPath, JSON.stringify(proverbs, null, 2));
             }
 
             const labels = templates.labels.newIssue;

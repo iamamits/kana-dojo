@@ -37,6 +37,7 @@ jobs:
 
             const themeBacklogPath = 'data/community/theme-backlog.json';
             const factsBacklogPath = 'data/community/facts-backlog.json';
+            const proverbsBacklogPath = 'data/community/proverbs-backlog.json';
 
             const prTitle = context.payload.pull_request.title;
             const prTitleLower = prTitle.toLowerCase();
@@ -45,9 +46,10 @@ jobs:
             const prAuthor = context.payload.pull_request.user.login;
 
             const isThemeContribution = prTitleLower.includes('theme');
-            const isFactContribution = prTitleLower.includes('fact');
+            const isFactContribution = prTitleLower.includes('fact') && !prTitleLower.includes('proverb');
+            const isProverbContribution = prTitleLower.includes('proverb');
 
-            if (!isThemeContribution && !isFactContribution) {
+            if (!isThemeContribution && !isFactContribution && !isProverbContribution) {
               console.log('Not a community contribution PR, skipping');
               core.setOutput('should_commit', 'false');
               return;
@@ -108,6 +110,19 @@ jobs:
                     if (issue.title.includes('Add Japan Fact #' + factId)) {
                       targetIssue = issue.number;
                       console.log('Found matching fact issue: #' + targetIssue);
+                      break;
+                    }
+                  }
+                }
+              } else if (isProverbContribution) {
+                const proverbIdMatch = prTitle.match(/#(\d+)/);
+                if (proverbIdMatch) {
+                  const proverbId = proverbIdMatch[1];
+                  console.log('Looking for proverb issue: #' + proverbId);
+                  for (const issue of issues) {
+                    if (issue.title.includes('Add Japanese Proverb #' + proverbId)) {
+                      targetIssue = issue.number;
+                      console.log('Found matching proverb issue: #' + targetIssue);
                       break;
                     }
                   }
@@ -182,6 +197,21 @@ jobs:
                       fs.writeFileSync(factsBacklogPath, JSON.stringify(facts, null, 2));
                       needsCommit = true;
                       console.log('Marked fact #' + factId + ' as completed');
+                    }
+                  }
+                } else if (isProverbContribution) {
+                  const proverbs = JSON.parse(fs.readFileSync(proverbsBacklogPath, 'utf8'));
+                  const proverbIdMatch = prTitle.match(/#(\d+)/);
+                  if (proverbIdMatch) {
+                    const proverbId = parseInt(proverbIdMatch[1]);
+                    const proverbIndex = proverbs.findIndex(function(p) { return p.id === proverbId; });
+                    if (proverbIndex !== -1) {
+                      proverbs[proverbIndex].completed = true;
+                      proverbs[proverbIndex].completedBy = prAuthor;
+                      proverbs[proverbIndex].completedPR = prNumber;
+                      fs.writeFileSync(proverbsBacklogPath, JSON.stringify(proverbs, null, 2));
+                      needsCommit = true;
+                      console.log('Marked proverb #' + proverbId + ' as completed');
                     }
                   }
                 }

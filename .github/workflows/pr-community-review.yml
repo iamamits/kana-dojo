@@ -17,7 +17,7 @@ concurrency:
 jobs:
   validate-and-merge:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.title, 'theme') || contains(github.event.pull_request.title, 'fact') || contains(github.event.pull_request.title, 'Theme') || contains(github.event.pull_request.title, 'Fact')
+    if: contains(github.event.pull_request.title, 'theme') || contains(github.event.pull_request.title, 'fact') || contains(github.event.pull_request.title, 'Theme') || contains(github.event.pull_request.title, 'Fact') || contains(github.event.pull_request.title, 'proverb') || contains(github.event.pull_request.title, 'Proverb')
 
     steps:
       - name: Checkout base branch
@@ -57,9 +57,10 @@ jobs:
             let foundIssue = null;
 
             const isThemeContribution = prTitleLower.includes('theme');
-            const isFactContribution = prTitleLower.includes('fact');
+            const isFactContribution = prTitleLower.includes('fact') && !prTitleLower.includes('proverb');
+            const isProverbContribution = prTitleLower.includes('proverb');
 
-            if (!isThemeContribution && !isFactContribution) {
+            if (!isThemeContribution && !isFactContribution && !isProverbContribution) {
               console.log('Not a community contribution PR');
               return;
             }
@@ -118,6 +119,19 @@ jobs:
                     if (issue.title.includes('Add Japan Fact #' + factId)) {
                       foundIssue = issue.number;
                       console.log('Found matching fact issue: #' + foundIssue);
+                      break;
+                    }
+                  }
+                }
+              } else if (isProverbContribution) {
+                const proverbIdMatch = prTitle.match(/#(\d+)/);
+                if (proverbIdMatch) {
+                  const proverbId = proverbIdMatch[1];
+                  console.log('Looking for proverb issue: #' + proverbId);
+                  for (const issue of issues) {
+                    if (issue.title.includes('Add Japanese Proverb #' + proverbId)) {
+                      foundIssue = issue.number;
+                      console.log('Found matching proverb issue: #' + foundIssue);
                       break;
                     }
                   }
@@ -188,6 +202,42 @@ jobs:
                 }
               } catch (e) {
                 errors.push('Error reading facts file: ' + e.message);
+              }
+            } else if (isProverbContribution) {
+              validationType = 'proverb';
+              console.log('Validating proverb contribution');
+              
+              try {
+                const proverbsPath = 'pr-head/public/japanese-proverbs.json';
+                if (!fs.existsSync(proverbsPath)) {
+                  errors.push('japanese-proverbs.json file not found in PR');
+                } else {
+                  const content = fs.readFileSync(proverbsPath, 'utf8');
+                  
+                  try {
+                    const proverbs = JSON.parse(content);
+                    
+                    if (!Array.isArray(proverbs)) {
+                      errors.push('japanese-proverbs.json should be an array');
+                    } else {
+                      // Check each proverb has required fields
+                      const invalidProverbs = proverbs.filter(function(p) {
+                        return !p.japanese || !p.romaji || !p.english || !p.meaning;
+                      });
+                      if (invalidProverbs.length > 0) {
+                        errors.push('Each proverb must have japanese, romaji, english, and meaning fields');
+                      }
+                    }
+                  } catch (parseErr) {
+                    errors.push('Invalid JSON: ' + parseErr.message);
+                  }
+                  
+                  if (!targetIssue) {
+                    errors.push('Could not find a matching community issue for this proverb');
+                  }
+                }
+              } catch (e) {
+                errors.push('Error reading proverbs file: ' + e.message);
               }
             }
 

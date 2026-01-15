@@ -223,6 +223,27 @@ module.exports = {
         'Link this issue using `Closes #<issue_number>`'
       ],
       footer: "**Questions?** Comment below and we'll help! 🙌"
+    },
+    proverb: {
+      title:
+        '[Good First Issue] 🎌 Add Japanese Proverb #{id} (good first issue)',
+      header: '## 🎌 Add Japanese Proverb (ことわざ)',
+      category: 'Community Contribution - Proverb',
+      difficulty: 'Easy (good first issue)',
+      estimatedTime: '1 minute (good first issue)',
+      taskDescription:
+        'Add this traditional Japanese proverb to help learners understand Japanese wisdom!',
+      proverbHeader: '### The Proverb',
+      instructionsHeader: '### 📝 Instructions',
+      instructions: [
+        'Open [`public/japanese-proverbs.json`](../blob/main/public/japanese-proverbs.json)',
+        'Add this proverb object to the end of the array (before the closing `]`)',
+        'Make sure to add a comma after the previous last item',
+        'Save the file and commit the changes',
+        'Submit a Pull Request with title: `content: add japanese proverb #{id}`',
+        'Link this issue using `Closes #<issue_number>`'
+      ],
+      footer: "**Questions?** Comment below and we'll help! 🙌"
     }
   }
 };
