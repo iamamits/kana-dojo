@@ -1258,6 +1258,12 @@ const baseThemeSets: BaseThemeGroup[] = [
         mainColor: 'oklch(78.0% 0.205 35.0 / 1)',
         secondaryColor: 'oklch(88.0% 0.065 210.0 / 1)',
       },
+      {
+  id: 'paper-lantern',
+  backgroundColor: 'oklch(94.0% 0.010 95.0 / 1)',
+  mainColor: 'oklch(55.0% 0.095 55.0 / 1)',
+  secondaryColor: 'oklch(68.0% 0.085 30.0 / 1)'
+},
     ],
   },
   {
