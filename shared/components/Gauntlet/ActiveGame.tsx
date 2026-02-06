@@ -287,6 +287,8 @@ export default function ActiveGame<T>({
   }, [questionKey]);
 
   // Keyboard shortcut for Enter/Space to trigger button
+  // Only fires when no interactive element (input, textarea, select, button) is focused,
+  // or when the focused element IS our action button, to avoid interfering with other controls.
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
@@ -294,7 +296,17 @@ export default function ActiveGame<T>({
         event.code === 'Space' ||
         event.key === ' '
       ) {
-        buttonRef.current?.click();
+        const active = document.activeElement;
+        const tag = active?.tagName?.toLowerCase();
+        // Allow if no interactive element is focused, or if our button is focused
+        if (
+          active === buttonRef.current ||
+          !tag ||
+          !['input', 'textarea', 'select', 'button'].includes(tag)
+        ) {
+          event.preventDefault();
+          buttonRef.current?.click();
+        }
       }
     };
 

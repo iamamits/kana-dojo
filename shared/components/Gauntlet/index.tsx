@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from '@/core/i18n/routing';
 import { Random } from 'random-js';
 import { useClick, useCorrect, useError } from '@/shared/hooks/useAudio';
+import { shuffle } from '@/shared/lib/shuffle';
 import { saveSession } from '@/shared/lib/gauntletStats';
 import useGauntletSettingsStore from '@/shared/store/useGauntletSettingsStore';
 
@@ -94,14 +95,14 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
     dojoLabel,
     items,
     selectedSets,
-    generateQuestion,
+    generateQuestion: _generateQuestion,
     renderQuestion,
-    checkAnswer,
-    getCorrectAnswer,
+    checkAnswer: _checkAnswer,
+    getCorrectAnswer: _getCorrectAnswer,
     generateOptions,
     renderOption,
     getCorrectOption,
-    initialGameMode,
+    initialGameMode: _initialGameMode,
   } = config;
 
   // Game configuration state - initialized from store for all settings
@@ -165,21 +166,20 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
 
   // Time tracking
   const [startTime, setStartTime] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
   const [answerTimes, setAnswerTimes] = useState<number[]>([]);
   const lastAnswerTime = useRef(0);
 
   // Answer feedback
-  const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(
+  const [_lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(
     null,
   );
-  const [lifeJustGained, setLifeJustGained] = useState(false);
-  const [lifeJustLost, setLifeJustLost] = useState(false);
+  const [_lifeJustGained, setLifeJustGained] = useState(false);
+  const [_lifeJustLost, setLifeJustLost] = useState(false);
 
   // Input state
-  const [userAnswer, setUserAnswer] = useState('');
+  const [_userAnswer, setUserAnswer] = useState('');
   const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
-  const [wrongSelectedAnswers, setWrongSelectedAnswers] = useState<string[]>(
+  const [_wrongSelectedAnswers, setWrongSelectedAnswers] = useState<string[]>(
     [],
   );
 
@@ -207,17 +207,6 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
     statsTracking.recordDojoUsed(dojoType);
   }, [dojoType]);
 
-  // Timer effect
-  useEffect(() => {
-    if (phase !== 'playing' || startTime === 0) return;
-
-    const interval = setInterval(() => {
-      setElapsedTime(Date.now() - startTime);
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [phase, startTime]);
-
   // Generate options when question changes (always uses Pick/tile mode now)
   useEffect(() => {
     if (currentQuestion && generateOptions && phase === 'playing') {
@@ -227,8 +216,7 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
         4,
         isReverseActive,
       );
-      const shuffled = [...options].sort(() => random.real(0, 1) - 0.5);
-      setShuffledOptions(shuffled);
+      setShuffledOptions(shuffle(options));
       setWrongSelectedAnswers([]);
     }
   }, [currentQuestion, generateOptions, items, isReverseActive, phase]);
@@ -257,7 +245,6 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
 
     const now = Date.now();
     setStartTime(now);
-    setElapsedTime(0);
     setAnswerTimes([]);
     lastAnswerTime.current = now;
 
@@ -276,8 +263,7 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
         4,
         isReverseActive,
       );
-      const shuffled = [...options].sort(() => random.real(0, 1) - 0.5);
-      setShuffledOptions(shuffled);
+      setShuffledOptions(shuffle(options));
     }
 
     setPhase('playing');
@@ -400,9 +386,15 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
 
   const recordAnswerTime = useCallback(() => {
     const now = Date.now();
-    const timeTaken = now - lastAnswerTime.current;
+    // Skip recording if lastAnswerTime hasn't been set yet (shouldn't happen,
+    // but guard against negative/zero times from race conditions)
+    if (lastAnswerTime.current > 0) {
+      const timeTaken = now - lastAnswerTime.current;
+      if (timeTaken > 0) {
+        setAnswerTimes(prev => [...prev, timeTaken]);
+      }
+    }
     lastAnswerTime.current = now;
-    setAnswerTimes(prev => [...prev, timeTaken]);
   }, []);
 
   const advanceToNextQuestion = useCallback(
@@ -565,34 +557,6 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
     ],
   );
 
-  const handleSubmit = useCallback(() => {
-    if (!currentQuestion) return;
-    const trimmed = userAnswer.trim();
-    if (!trimmed) return;
-
-    const isCorrect = checkAnswer(
-      currentQuestion.item,
-      trimmed,
-      isReverseActive,
-    );
-    submitAnswer(isCorrect);
-  }, [checkAnswer, currentQuestion, isReverseActive, submitAnswer, userAnswer]);
-
-  const handlePickSubmit = useCallback(
-    (selectedOption: string) => {
-      if (!currentQuestion || !getCorrectOption) return;
-
-      const correctOption = getCorrectOption(
-        currentQuestion.item,
-        isReverseActive,
-      );
-      const isCorrect = selectedOption === correctOption;
-
-      submitAnswer(isCorrect);
-    },
-    [currentQuestion, getCorrectOption, isReverseActive, submitAnswer],
-  );
-
   // Handle cancel
   const handleCancel = useCallback(() => {
     playClick();
@@ -664,6 +628,11 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
     );
   }
 
+  // Safety check: ActiveGame requires getCorrectOption for Pick mode
+  if (!getCorrectOption) {
+    return <EmptyState dojoType={dojoType} dojoLabel={dojoLabel} />;
+  }
+
   return (
     <ActiveGame
       dojoType={dojoType}
@@ -678,7 +647,7 @@ export default function Gauntlet<T>({ config, onCancel }: GauntletProps<T>) {
       renderOption={renderOption}
       items={items}
       onSubmit={handleActiveGameSubmit}
-      getCorrectOption={getCorrectOption!}
+      getCorrectOption={getCorrectOption}
       onCancel={handleCancel}
       questionKey={questionKey}
     />
