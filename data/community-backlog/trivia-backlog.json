@@ -971,7 +971,8 @@
       "Lake Ashi",
       "Lake Shinji"
     ],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "completed": true
   },
   {
     "id": 76,
@@ -983,7 +984,8 @@
       "Ramen",
       "Somem"
     ],
-    "correctIndex": 0
+    "correctIndex": 0,
+    "issued": true
   },
   {
     "id": 77,
