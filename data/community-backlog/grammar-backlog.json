@@ -224,13 +224,13 @@
   {
     "id": 38,
     "text": "\"〜に違いない\" means \"must be\" or \"no doubt\".",
-    "completed": false,
+    "completed": true,
     "issued": false
   },
   {
     "id": 39,
     "text": "\"〜かもしれない\" means \"might be\" or \"maybe\".",
-    "issued": false,
+    "issued": true,
     "completed": false
   },
   {
