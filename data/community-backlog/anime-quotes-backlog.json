@@ -386,7 +386,7 @@
     "english": "Relax, I'm the strongest.",
     "anime": "Jujutsu Kaisen",
     "character": "Satoru Gojo",
-    "completed": false,
+    "completed": true,
     "issued": false
   },
   {
@@ -396,7 +396,7 @@
     "english": "All I want is to live a normal life.",
     "anime": "Chainsaw Man",
     "character": "Denji",
-    "completed": false,
+    "completed": true,
     "issued": false
   },
   {
@@ -406,7 +406,7 @@
     "english": "In the name of the moon, I'll punish you!",
     "anime": "Sailor Moon",
     "character": "Usagi Tsukino",
-    "completed": false,
+    "completed": true,
     "issued": false
   },
   {
@@ -416,7 +416,7 @@
     "english": "I'm just a hero for fun.",
     "anime": "One Punch Man",
     "character": "Saitama",
-    "completed": false,
+    "completed": true,
     "issued": false
   },
   {
@@ -426,7 +426,7 @@
     "english": "As long as I have something to protect, I won't lose.",
     "anime": "Bleach",
     "character": "Ichigo Kurosaki",
-    "completed": false,
+    "completed": true,
     "issued": false
   },
   {
@@ -436,7 +436,7 @@
     "english": "I will become the god of the new world.",
     "anime": "Death Note",
     "character": "Light Yagami",
-    "completed": false,
+    "completed": true,
     "issued": false
   },
   {
@@ -447,7 +447,7 @@
     "anime": "Code Geass: Lelouch of the Rebellion",
     "character": "Lelouch vi Britannia",
     "issued": false,
-    "completed": false
+    "completed": true
   },
   {
     "id": 46,
@@ -456,7 +456,7 @@
     "english": "Who the hell do you think I am!",
     "anime": "Gurren Lagann",
     "character": "Kamina",
-    "issued": false,
+    "issued": true,
     "completed": false
   },
   {
