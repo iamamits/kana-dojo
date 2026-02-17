@@ -54,7 +54,7 @@ jobs:
               per_page: 100
             });
 
-            const allowedPrefixes = ['data/community-content/'];
+            const allowedPrefixes = ['community/content/'];
             const allowedFiles = new Set(['package-lock.json']);
 
             const outsideFiles = files
@@ -68,7 +68,7 @@ jobs:
             core.setOutput('is_community_only', isCommunityOnly ? 'true' : 'false');
 
             if (isCommunityOnly) {
-              console.log('PR only touches data/community-content (and optionally package-lock.json); skipping checks.');
+              console.log('PR only touches community/content (and optionally package-lock.json); skipping checks.');
             } else if (outsideFiles.length > 0) {
               console.log(`PR touches non-community files; running full checks. Examples: ${outsideFiles.slice(0, 5).join(', ')}`);
             }

@@ -23,7 +23,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const authorsPath = 'data/community-backlog/pr-authors.json';
+            const authorsPath = 'community/backlog/pr-authors.json';
             const authorsSet = new Set();
 
             let page = 1;

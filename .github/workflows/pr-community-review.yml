@@ -210,15 +210,15 @@ jobs:
               validationType = 'theme';
               console.log('Validating theme contribution');
 
-              const allowed = ['data/community-content/community-themes.json'];
+              const allowed = ['community/content/community-themes.json'];
               const changed = reviewedFiles.map(function(f) { return f.filename; });
               const invalidFiles = changed.filter(function(p) { return !allowed.includes(p); });
               if (changed.length !== 1 || invalidFiles.length > 0) {
-                errors.push('Theme PRs must modify only data/community-content/community-themes.json');
+                errors.push('Theme PRs must modify only community/content/community-themes.json');
               }
               
               try {
-                const themesPath = 'pr-head/data/community-content/community-themes.json';
+                const themesPath = 'pr-head/community/content/community-themes.json';
                 if (!fs.existsSync(themesPath)) {
                   errors.push('community-themes.json file not found in PR');
                 } else {
@@ -251,15 +251,15 @@ jobs:
               validationType = 'fact';
               console.log('Validating fact contribution');
 
-              const allowed = ['data/community-content/japan-facts.json'];
+              const allowed = ['community/content/japan-facts.json'];
               const changed = reviewedFiles.map(function(f) { return f.filename; });
               const invalidFiles = changed.filter(function(p) { return !allowed.includes(p); });
               if (changed.length !== 1 || invalidFiles.length > 0) {
-                errors.push('Fact PRs must modify only data/community-content/japan-facts.json');
+                errors.push('Fact PRs must modify only community/content/japan-facts.json');
               }
               
               try {
-                const factsPath = 'pr-head/data/community-content/japan-facts.json';
+                const factsPath = 'pr-head/community/content/japan-facts.json';
                 if (!fs.existsSync(factsPath)) {
                   errors.push('japan-facts.json file not found in PR');
                 } else {
@@ -291,15 +291,15 @@ jobs:
               validationType = 'proverb';
               console.log('Validating proverb contribution');
 
-              const allowed = ['data/community-content/japanese-proverbs.json'];
+              const allowed = ['community/content/japanese-proverbs.json'];
               const changed = reviewedFiles.map(function(f) { return f.filename; });
               const invalidFiles = changed.filter(function(p) { return !allowed.includes(p); });
               if (changed.length !== 1 || invalidFiles.length > 0) {
-                errors.push('Proverb PRs must modify only data/community-content/japanese-proverbs.json');
+                errors.push('Proverb PRs must modify only community/content/japanese-proverbs.json');
               }
               
               try {
-                const proverbsPath = 'pr-head/data/community-content/japanese-proverbs.json';
+                const proverbsPath = 'pr-head/community/content/japanese-proverbs.json';
                 if (!fs.existsSync(proverbsPath)) {
                   errors.push('japanese-proverbs.json file not found in PR');
                 } else {
@@ -339,7 +339,7 @@ jobs:
               const triviaChanged = changed.filter(function(p) { return triviaFilePattern.test(p); });
               const invalidFiles = changed.filter(function(p) { return !triviaFilePattern.test(p); });
               if (triviaChanged.length !== 1 || invalidFiles.length > 0) {
-                errors.push('Trivia PRs must modify exactly one trivia JSON file in data/community-content (easy/medium/hard).');
+                errors.push('Trivia PRs must modify exactly one trivia JSON file in community/content (easy/medium/hard).');
               }
 
               try {
@@ -377,15 +377,15 @@ jobs:
               validationType = 'grammar';
               console.log('Validating grammar contribution');
 
-              const allowed = ['data/community-content/japanese-grammar.json'];
+              const allowed = ['community/content/japanese-grammar.json'];
               const changed = reviewedFiles.map(function(f) { return f.filename; });
               const invalidFiles = changed.filter(function(p) { return !allowed.includes(p); });
               if (changed.length !== 1 || invalidFiles.length > 0) {
-                errors.push('Grammar PRs must modify only data/community-content/japanese-grammar.json');
+                errors.push('Grammar PRs must modify only community/content/japanese-grammar.json');
               }
 
               try {
-                const grammarPath = 'pr-head/data/community-content/japanese-grammar.json';
+                const grammarPath = 'pr-head/community/content/japanese-grammar.json';
                 if (!fs.existsSync(grammarPath)) {
                   errors.push('japanese-grammar.json file not found in PR');
                 } else {
@@ -417,15 +417,15 @@ jobs:
               validationType = 'anime quote';
               console.log('Validating anime quote contribution');
 
-              const allowed = ['data/community-content/anime-quotes.json'];
+              const allowed = ['community/content/anime-quotes.json'];
               const changed = reviewedFiles.map(function(f) { return f.filename; });
               const invalidFiles = changed.filter(function(p) { return !allowed.includes(p); });
               if (changed.length !== 1 || invalidFiles.length > 0) {
-                errors.push('Anime quote PRs must modify only data/community-content/anime-quotes.json');
+                errors.push('Anime quote PRs must modify only community/content/anime-quotes.json');
               }
 
               try {
-                const quotesPath = 'pr-head/data/community-content/anime-quotes.json';
+                const quotesPath = 'pr-head/community/content/anime-quotes.json';
                 if (!fs.existsSync(quotesPath)) {
                   errors.push('anime-quotes.json file not found in PR');
                 } else {

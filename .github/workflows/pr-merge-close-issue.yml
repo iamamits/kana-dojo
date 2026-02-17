@@ -36,12 +36,12 @@ jobs:
             const templates = require('./.github/templates/messages.cjs');
             const t = templates.prMerge.issueComment;
 
-            const themeBacklogPath = 'data/community-backlog/theme-backlog.json';
-            const factsBacklogPath = 'data/community-backlog/facts-backlog.json';
-            const proverbsBacklogPath = 'data/community-backlog/proverbs-backlog.json';
-            const triviaBacklogPath = 'data/community-backlog/trivia-backlog.json';
-            const grammarBacklogPath = 'data/community-backlog/grammar-backlog.json';
-            const animeQuotesBacklogPath = 'data/community-backlog/anime-quotes-backlog.json';
+            const themeBacklogPath = 'community/backlog/theme-backlog.json';
+            const factsBacklogPath = 'community/backlog/facts-backlog.json';
+            const proverbsBacklogPath = 'community/backlog/proverbs-backlog.json';
+            const triviaBacklogPath = 'community/backlog/trivia-backlog.json';
+            const grammarBacklogPath = 'community/backlog/grammar-backlog.json';
+            const animeQuotesBacklogPath = 'community/backlog/anime-quotes-backlog.json';
 
             const prTitle = context.payload.pull_request.title;
             const prTitleLower = prTitle.toLowerCase();
@@ -329,7 +329,7 @@ jobs:
       - name: Commit backlog updates
         if: steps.close-issue.outputs.should_commit == 'true'
         run: |
-          git add data/community-backlog/
+          git add community/backlog/
           if git diff --cached --quiet; then
             echo "No backlog changes to commit."
             exit 0

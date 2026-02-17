@@ -105,25 +105,25 @@ jobs:
               return fallbackMilestoneNumber;
             }
 
-            const statePath = 'data/community-backlog/automation-state.json';
-            const themeBacklogPath = 'data/community-backlog/theme-backlog.json';
-            const factsBacklogPath = 'data/community-backlog/facts-backlog.json';
-            const proverbsBacklogPath = 'data/community-backlog/proverbs-backlog.json';
-            const triviaBacklogPath = 'data/community-backlog/trivia-backlog.json';
-            const grammarBacklogPath = 'data/community-backlog/grammar-backlog.json';
-            const animeQuotesBacklogPath = 'data/community-backlog/anime-quotes-backlog.json';
+            const statePath = 'community/backlog/automation-state.json';
+            const themeBacklogPath = 'community/backlog/theme-backlog.json';
+            const factsBacklogPath = 'community/backlog/facts-backlog.json';
+            const proverbsBacklogPath = 'community/backlog/proverbs-backlog.json';
+            const triviaBacklogPath = 'community/backlog/trivia-backlog.json';
+            const grammarBacklogPath = 'community/backlog/grammar-backlog.json';
+            const animeQuotesBacklogPath = 'community/backlog/anime-quotes-backlog.json';
 
-            const themesSourcePath = 'data/community-content/community-themes.json';
-            const factsSourcePath = 'data/community-content/japan-facts.json';
-            const proverbsSourcePath = 'data/community-content/japanese-proverbs.json';
+            const themesSourcePath = 'community/content/community-themes.json';
+            const factsSourcePath = 'community/content/japan-facts.json';
+            const proverbsSourcePath = 'community/content/japanese-proverbs.json';
             const triviaSourcePaths = {
-              easy: 'data/community-content/japan-trivia-easy.json',
-              medium: 'data/community-content/japan-trivia-medium.json',
-              hard: 'data/community-content/japan-trivia-hard.json'
+              easy: 'community/content/japan-trivia-easy.json',
+              medium: 'community/content/japan-trivia-medium.json',
+              hard: 'community/content/japan-trivia-hard.json'
             };
-            const triviaLegacyPath = 'data/community-content/japan-trivia.json';
-            const grammarSourcePath = 'data/community-content/japanese-grammar.json';
-            const animeQuotesSourcePath = 'data/community-content/anime-quotes.json';
+            const triviaLegacyPath = 'community/content/japan-trivia.json';
+            const grammarSourcePath = 'community/content/japanese-grammar.json';
+            const animeQuotesSourcePath = 'community/content/anime-quotes.json';
 
             let state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
             const themes = JSON.parse(fs.readFileSync(themeBacklogPath, 'utf8'));
@@ -711,7 +711,7 @@ jobs:
       - name: Commit backlog updates
         if: steps.create-issue.outputs.should_commit == 'true'
         run: |
-          git add data/community-backlog/
+          git add community/backlog/
           if git diff --cached --quiet; then
             echo "No backlog changes to commit."
             exit 0

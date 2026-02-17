@@ -43,7 +43,7 @@ if [ -z "$CHANGED_FILES" ]; then
 fi
 
 # Fast-path: only community data changes should never trigger a build
-ONLY_COMMUNITY_DATA=$(echo "$CHANGED_FILES" | grep -vE '^(data/community-backlog/|data/community-content/|@data/community-backlog/|@data/community-content/)' | grep -v '^$' | wc -l)
+ONLY_COMMUNITY_DATA=$(echo "$CHANGED_FILES" | grep -vE '^(community/backlog/|community/content/|@community/backlog/|@community/content/)' | grep -v '^$' | wc -l)
 if [ "$ONLY_COMMUNITY_DATA" -eq 0 ]; then
   echo "Only community data changed. Skipping build."
   exit 0
@@ -134,18 +134,18 @@ IGNORE_PATTERNS=(
   
   # Data and community content (non-build affecting)
   "^features/Preferences/data/themes\\.ts$"
-  "^data/community-content/community-themes\\.json$"
-  "^data/community-content/japan-facts\\.json$"
-  "^data/community-content/japanese-proverbs\\.json$"
-  "^data/community-content/japanese-grammar\\.json$"
-  "^data/community-content/anime-quotes\\.json$"
-  "^data/community-content/japan-trivia\\.json$"
-  "^data/community-content/japan-trivia-(easy|medium|hard)\\.json$"
-  "^data/community-backlog/automation-state\\.json$"
-  "^data/community-content/"
-  "^data/community-backlog/"
-  "^@data/community-content/"
-  "^@data/community-backlog/"
+  "^community/content/community-themes\\.json$"
+  "^community/content/japan-facts\\.json$"
+  "^community/content/japanese-proverbs\\.json$"
+  "^community/content/japanese-grammar\\.json$"
+  "^community/content/anime-quotes\\.json$"
+  "^community/content/japan-trivia\\.json$"
+  "^community/content/japan-trivia-(easy|medium|hard)\\.json$"
+  "^community/backlog/automation-state\\.json$"
+  "^community/content/"
+  "^community/backlog/"
+  "^@community/content/"
+  "^@community/backlog/"
   "^data/.*\\.json$"
   "^data/"
 )
