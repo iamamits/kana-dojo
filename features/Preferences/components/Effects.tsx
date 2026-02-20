@@ -1,11 +1,40 @@
 'use client';
 import clsx from 'clsx';
-import { useMemo } from 'react';
 import usePreferencesStore from '@/features/Preferences/store/usePreferencesStore';
 import { buttonBorderStyles } from '@/shared/lib/styles';
 import { CURSOR_TRAIL_EFFECTS, CLICK_EFFECTS } from '../data/effectsData';
 import CollapsibleSection from './CollapsibleSection';
 import { MousePointer2, Zap } from 'lucide-react';
+
+const CLICK_EFFECT_MANUAL_ORDER = [
+  'none',
+  'firework',
+  'sakura',
+  'torii',
+  'festival',
+  'wave',
+  'dango',
+  'lantern',
+  'fan',
+  'fish',
+  'sparkle',
+  'lotus',
+  'maple',
+  'tea',
+  'blossom',
+  'wind',
+  'star',
+  'bamboo',
+  'butterfly',
+  'snowflake',
+  'fuji',
+  'rice',
+] as const;
+
+const clickEffectById = new Map(CLICK_EFFECTS.map(effect => [effect.id, effect]));
+const ORDERED_CLICK_EFFECTS = CLICK_EFFECT_MANUAL_ORDER.map(
+  id => clickEffectById.get(id)!,
+);
 
 // ─── Effect card ─────────────────────────────────────────────────────────────
 
@@ -59,15 +88,6 @@ const Effects = () => {
   const setCursorTrailEffect = usePreferencesStore(s => s.setCursorTrailEffect);
   const clickEffect = usePreferencesStore(s => s.clickEffect);
   const setClickEffect = usePreferencesStore(s => s.setClickEffect);
-  const shuffledClickEffects = useMemo(() => {
-    const [noneEffect, ...rest] = CLICK_EFFECTS;
-    const shuffled = [...rest];
-    for (let i = shuffled.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return noneEffect ? [noneEffect, ...shuffled] : shuffled;
-  }, []);
 
   return (
     <div className='flex flex-col gap-6'>
@@ -109,7 +129,7 @@ const Effects = () => {
         storageKey='prefs-effects-click'
       >
         <fieldset className='grid grid-cols-2 gap-4 p-1 md:grid-cols-3 lg:grid-cols-4'>
-          {shuffledClickEffects.map(effect => (
+          {ORDERED_CLICK_EFFECTS.map(effect => (
             <EffectCard
               key={effect.id}
               name={effect.name}
