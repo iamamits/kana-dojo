@@ -59,7 +59,7 @@ const socialLinks: SocialLink[] = [
   // }
 ];
 
-const ENABLE_STATS_DESIGN = true; // Toggle to switch between old and new stats design
+const ENABLE_STATS_DESIGN = false; // Toggle to switch between old and new stats design
 
 const MobileBottomBar = () => {
   const { playClick } = useClick();
